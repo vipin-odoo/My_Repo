@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 class DocumentsDocument(models.Model):
     _inherit = "documents.document"
 
+    file = fields.Binary(string="PDF File", attachment=True)
     annotation_version = fields.Integer(default=0, readonly=True)
     annotation_history_ids = fields.One2many(
         "pdf.annotation.history",
@@ -24,9 +25,32 @@ class DocumentsDocument(models.Model):
         for document in self:
             document.annotation_history_count = len(document.annotation_history_ids)
 
+    def _is_pdf_document(self):
+        self.ensure_one()
+        return self.mimetype == "application/pdf" or bool(self.file)
+
+    def _get_or_create_source_attachment(self):
+        self.ensure_one()
+        if self.attachment_id:
+            return self.attachment_id
+        if not self.file:
+            return False
+
+        attachment = self.env["ir.attachment"].create(
+            {
+                "name": f"{self.name or 'document'}.pdf",
+                "datas": self.file,
+                "mimetype": "application/pdf",
+                "res_model": self._name,
+                "res_id": self.id,
+            }
+        )
+        self.write({"attachment_id": attachment.id, "mimetype": "application/pdf"})
+        return attachment
+
     def action_open_pdf_annotator(self):
         self.ensure_one()
-        if self.mimetype != "application/pdf":
+        if not self._is_pdf_document():
             raise UserError(_("Only PDF documents can be annotated."))
 
         return {
@@ -53,7 +77,10 @@ class DocumentsDocument(models.Model):
 
     def get_pdf_annotation_payload(self):
         self.ensure_one()
-        attachment = self.attachment_id
+        if not self._is_pdf_document():
+            raise UserError(_("Only PDF documents can be annotated."))
+
+        attachment = self._get_or_create_source_attachment()
         return {
             "document_id": self.id,
             "document_name": self.name,
@@ -65,11 +92,11 @@ class DocumentsDocument(models.Model):
 
     def save_pdf_annotation(self, annotation_json, note=None, tools_used=None, annotated_pdf_data=None):
         self.ensure_one()
-        if self.mimetype != "application/pdf":
+        if not self._is_pdf_document():
             raise UserError(_("Only PDF documents can be annotated."))
 
         try:
-            json.loads(annotation_json or "{}")
+            payload = json.loads(annotation_json or "{}")
         except json.JSONDecodeError as error:
             raise UserError(_("Invalid annotation payload: %s") % error) from error
 
@@ -97,23 +124,24 @@ class DocumentsDocument(models.Model):
                 "annotated_attachment_id": attachment.id if attachment else False,
                 "user_id": self.env.user.id,
                 "tools_used": ", ".join(tools_used or []),
+                "page_count": payload.get("page_count", 0),
             }
         )
 
-        self.write(
-            {
-                "annotation_version": next_version,
-                "latest_annotation_json": annotation_json,
-                "latest_annotated_attachment_id": attachment.id if attachment else False,
-                "latest_annotated_by_id": self.env.user.id,
-                "latest_annotated_on": fields.Datetime.now(),
-            }
-        )
+        values = {
+            "annotation_version": next_version,
+            "latest_annotation_json": annotation_json,
+            "latest_annotated_attachment_id": attachment.id if attachment else False,
+            "latest_annotated_by_id": self.env.user.id,
+            "latest_annotated_on": fields.Datetime.now(),
+            "mimetype": "application/pdf",
+        }
+        if annotated_pdf_data:
+            values["file"] = annotated_pdf_data
+        self.write(values)
 
         self.message_post(
-            body=_(
-                "PDF annotations updated to version <b>%s</b> by %s."
-            )
+            body=_("PDF annotations updated to version <b>%s</b> by %s.")
             % (next_version, self.env.user.display_name)
         )
         return {
@@ -134,12 +162,11 @@ class DocumentsDocument(models.Model):
                 "latest_annotated_attachment_id": history.annotated_attachment_id.id,
                 "latest_annotated_by_id": self.env.user.id,
                 "latest_annotated_on": fields.Datetime.now(),
+                "file": history.annotated_attachment_id.datas if history.annotated_attachment_id else self.file,
             }
         )
         self.message_post(
-            body=_(
-                "Restored annotation snapshot from version <b>%s</b> by %s."
-            )
+            body=_("Restored annotation snapshot from version <b>%s</b> by %s.")
             % (history.version, self.env.user.display_name)
         )
         return {"ok": True}

@@ -10,7 +10,7 @@
                     type="object"
                     string="Annotate PDF"
                     class="oe_highlight"
-                    invisible="mimetype != 'application/pdf'"
+                    invisible="mimetype != 'application/pdf' and not file"
                 />
                 <button
                     name="action_view_annotation_history"
@@ -21,9 +21,10 @@
             </xpath>
 
             <xpath expr="//sheet/notebook" position="inside">
-                <page string="PDF Annotations" invisible="mimetype != 'application/pdf'">
+                <page string="PDF Annotations" invisible="mimetype != 'application/pdf' and not file">
                     <group>
                         <group>
+                            <field name="file" filename="name"/>
                             <field name="annotation_version"/>
                             <field name="latest_annotated_by_id"/>
                             <field name="latest_annotated_on"/>
