@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pdf_document_annotator.PdfAnnotatorAction">
+        <div class="o_pdf_annotator_root h-100 d-flex flex-column">
+            <div class="o_pdf_annotator_toolbar d-flex gap-2 align-items-center p-2 border-bottom">
+                <button class="btn btn-primary" t-on-click="() => this.setTool('draw')">Draw</button>
+                <button class="btn btn-secondary" t-on-click="() => this.setTool('highlight')">Highlight</button>
+                <button class="btn btn-secondary" t-on-click="() => this.setTool('text')">Text</button>
+                <button class="btn btn-secondary" t-on-click="() => this.setTool('rectangle')">Rectangle</button>
+                <button class="btn btn-secondary" t-on-click="() => this.setTool('ellipse')">Ellipse</button>
+                <button class="btn btn-secondary" t-on-click="() => this.setTool('arrow')">Arrow</button>
+                <button class="btn btn-light" t-on-click="undo">Undo</button>
+                <button class="btn btn-light" t-on-click="redo">Redo</button>
+                <button class="btn btn-success" t-on-click="save">Save Version</button>
+                <span class="ms-auto text-muted">Tool: <t t-esc="state.activeTool"/></span>
+            </div>
+
+            <div class="o_pdf_annotator_viewer flex-grow-1 position-relative">
+                <iframe class="o_pdf_frame" t-att-src="state.attachmentUrl"/>
+                <canvas class="o_pdf_canvas" t-ref="canvas" t-on-pointerdown="onPointerDown" t-on-pointermove="onPointerMove" t-on-pointerup="onPointerUp"/>
+            </div>
+        </div>
+    </t>
+</templates>
