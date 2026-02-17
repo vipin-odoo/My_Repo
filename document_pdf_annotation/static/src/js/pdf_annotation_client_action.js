@@ -1,6 +1,7 @@
 /** @odoo-module **/
 
 import { Component, onMounted, onWillUnmount, useRef, useState } from "@odoo/owl";
+import { rpc } from "@web/core/network/rpc";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 
@@ -8,7 +9,6 @@ class PdfAnnotationClientAction extends Component {
     static template = "document_pdf_annotation.PdfAnnotationClientAction";
 
     setup() {
-        this.rpc = useService("rpc");
         this.notification = useService("notification");
 
         this.state = useState({
@@ -32,13 +32,13 @@ class PdfAnnotationClientAction extends Component {
         });
 
         onWillUnmount(() => {
-            this.logAction("annotation_updated", { reason: "close_annotator" });
+            this.logAction("annotation_updated", { reason: "close_annotator" }).catch(() => {});
         });
     }
 
     async loadContext() {
         this.state.loading = true;
-        const payload = await this.rpc("/document_pdf_annotation/load", {
+        const payload = await rpc("/document_pdf_annotation/load", {
             document_id: this.state.documentId,
             version_id: this.state.currentVersionId,
         });
@@ -97,7 +97,7 @@ class PdfAnnotationClientAction extends Component {
     }
 
     async saveVersion() {
-        const response = await this.rpc("/document_pdf_annotation/save", {
+        const response = await rpc("/document_pdf_annotation/save", {
             document_id: this.state.documentId,
             annotation_payload: this.state.annotationPayload,
         });
@@ -109,7 +109,7 @@ class PdfAnnotationClientAction extends Component {
     }
 
     async logAction(actionType, details = {}) {
-        await this.rpc("/document_pdf_annotation/log_action", {
+        await rpc("/document_pdf_annotation/log_action", {
             document_id: this.state.documentId,
             action_type: actionType,
             version_id: this.state.currentVersionId,
