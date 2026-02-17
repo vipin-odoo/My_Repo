@@ -45,13 +45,10 @@ class DocumentDocument(models.Model):
             versions = record.version_ids.sorted("version_number", reverse=True)
             record.latest_version_id = versions[:1].id if versions else False
 
-    @api.depends("mimetype", "name")
+    @api.depends("file_name")
     def _compute_is_pdf(self):
         for record in self:
-            record.is_pdf = bool(
-                (record.mimetype and record.mimetype == "application/pdf")
-                or (record.name and record.name.lower().endswith(".pdf"))
-            )
+            record.is_pdf = bool(record.file_name and record.file_name.lower().endswith(".pdf"))
 
     def action_open_pdf_annotator(self):
         self.ensure_one()
@@ -101,7 +98,7 @@ class DocumentDocument(models.Model):
             "document_id": self.id,
             "version_number": next_version,
             "file_data": self.file,
-            "file_name": self.name,
+            "file_name": self.file_name,
             "annotation_data": json.dumps(annotation_payload),
             "created_by": self.env.user.id,
             "created_on": fields.Datetime.now(),
