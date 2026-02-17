@@ -42,14 +42,27 @@ class PdfAnnotationClientAction extends Component {
             document_id: this.state.documentId,
             version_id: this.state.currentVersionId,
         });
+        if (payload.error) {
+            this.notification.add(payload.error, { type: "danger" });
+            this.state.loading = false;
+            return;
+        }
         this.state.currentVersionId = payload.active_version_id;
         this.state.currentVersionNumber = payload.active_version_number;
         this.state.versions = payload.versions || [];
-        this.state.annotationPayload = payload.annotation_payload || { items: [] };
+        this.state.annotationPayload = this.normalizeAnnotationPayload(payload.annotation_payload);
 
         const iframe = this.canvasRef.el;
-        iframe.src = `data:application/pdf;base64,${payload.file_b64 || ""}`;
+        iframe.src = payload.file_b64 ? `data:application/pdf;base64,${payload.file_b64}` : "about:blank";
         this.state.loading = false;
+    }
+
+    normalizeAnnotationPayload(rawPayload) {
+        const normalizedPayload = rawPayload && typeof rawPayload === "object" && !Array.isArray(rawPayload)
+            ? { ...rawPayload }
+            : {};
+        normalizedPayload.items = Array.isArray(normalizedPayload.items) ? normalizedPayload.items : [];
+        return normalizedPayload;
     }
 
     selectTool(tool) {
@@ -64,6 +77,7 @@ class PdfAnnotationClientAction extends Component {
     }
 
     addSimpleAnnotation() {
+        this.state.annotationPayload = this.normalizeAnnotationPayload(this.state.annotationPayload);
         const entry = {
             tool: this.state.selectedTool,
             color: this.state.selectedColor,
@@ -76,6 +90,7 @@ class PdfAnnotationClientAction extends Component {
     }
 
     undo() {
+        this.state.annotationPayload = this.normalizeAnnotationPayload(this.state.annotationPayload);
         if (this.state.annotationPayload.items.length) {
             const removed = this.state.annotationPayload.items.pop();
             this.logAction("annotation_deleted", removed);
