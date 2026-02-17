@@ -25,6 +25,20 @@ class PdfAnnotationClientAction extends Component {
             annotationPayload: { items: [] },
         });
 
+        this.tools = [
+            { key: "highlight", label: "Highlight", icon: "fa-highlighter" },
+            { key: "underline", label: "Underline", icon: "fa-underline" },
+            { key: "strike", label: "Strike-through", icon: "fa-strikethrough" },
+            { key: "freehand", label: "Freehand", icon: "fa-pen" },
+            { key: "textbox", label: "Text Box", icon: "fa-font" },
+            { key: "sticky_note", label: "Sticky Note", icon: "fa-sticky-note" },
+            { key: "rectangle", label: "Rectangle", icon: "fa-square" },
+            { key: "circle", label: "Circle", icon: "fa-circle" },
+            { key: "arrow", label: "Arrow", icon: "fa-long-arrow-right" },
+            { key: "line", label: "Line", icon: "fa-minus" },
+            { key: "eraser", label: "Eraser", icon: "fa-eraser" },
+        ];
+
         this.canvasRef = useRef("annotationCanvas");
 
         onMounted(async () => {
@@ -126,7 +140,7 @@ class PdfAnnotationClientAction extends Component {
             annotation_payload: this.state.annotationPayload,
         });
         if (response.ok) {
-            this.notification.add(`Saved as version v${response.version_number}`, { type: "success" });
+            this.notification.add(`PDF annotations saved as version v${response.version_number}`, { type: "success" });
             this.state.currentVersionId = response.version_id;
             await this.loadContext();
         }
