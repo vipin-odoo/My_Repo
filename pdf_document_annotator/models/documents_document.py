@@ -53,15 +53,29 @@ class DocumentsDocument(models.Model):
 
     def get_pdf_annotation_payload(self):
         self.ensure_one()
+        binary_field_name = self._get_binary_pdf_field_name()
         attachment = self.attachment_id
+        attachment_url = f"/web/content/{attachment.id}?download=false" if attachment else False
+        if not attachment_url and binary_field_name and self[binary_field_name]:
+            attachment_url = (
+                f"/web/content?model={self._name}&id={self.id}&field={binary_field_name}"
+                "&filename_field=name&download=false"
+            )
+
         return {
             "document_id": self.id,
             "document_name": self.name,
             "attachment_id": attachment.id if attachment else False,
-            "attachment_url": f"/web/content/{attachment.id}?download=false" if attachment else False,
+            "attachment_url": attachment_url,
             "annotation_version": self.annotation_version,
             "latest_annotation_json": self.latest_annotation_json,
         }
+
+    def _get_binary_pdf_field_name(self):
+        self.ensure_one()
+        if "file" in self._fields:
+            return "file"
+        return False
 
     def save_pdf_annotation(self, annotation_json, note=None, tools_used=None, annotated_pdf_data=None):
         self.ensure_one()
@@ -109,6 +123,10 @@ class DocumentsDocument(models.Model):
                 "latest_annotated_on": fields.Datetime.now(),
             }
         )
+
+        binary_field_name = self._get_binary_pdf_field_name()
+        if binary_field_name and annotated_pdf_data:
+            self.write({binary_field_name: annotated_pdf_data})
 
         self.message_post(
             body=_(
