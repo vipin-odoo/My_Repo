@@ -1,0 +1,97 @@
+<odoo>
+    <record id="view_documents_document_form_pdf_annotator" model="ir.ui.view">
+        <field name="name">documents.document.form.pdf.annotator</field>
+        <field name="model">documents.document</field>
+        <field name="inherit_id" ref="documents.view_document_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button
+                    name="action_open_pdf_annotator"
+                    type="object"
+                    string="Annotate PDF"
+                    class="oe_highlight"
+                    invisible="mimetype != 'application/pdf'"
+                />
+                <button
+                    name="action_view_annotation_history"
+                    type="object"
+                    string="Annotation History"
+                    invisible="annotation_history_count == 0"
+                />
+            </xpath>
+
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="PDF Annotations" invisible="mimetype != 'application/pdf'">
+                    <group>
+                        <group>
+                            <field name="annotation_version"/>
+                            <field name="latest_annotated_by_id"/>
+                            <field name="latest_annotated_on"/>
+                        </group>
+                        <group>
+                            <field name="annotation_history_count"/>
+                            <field name="latest_annotated_attachment_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="latest_annotation_json" readonly="1" nolabel="1" widget="text"/>
+                    </group>
+                    <field name="annotation_history_ids" readonly="1">
+                        <tree>
+                            <field name="version"/>
+                            <field name="name"/>
+                            <field name="user_id"/>
+                            <field name="tools_used"/>
+                            <field name="create_date"/>
+                            <field name="annotated_attachment_id"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_pdf_annotation_history_tree" model="ir.ui.view">
+        <field name="name">pdf.annotation.history.tree</field>
+        <field name="model">pdf.annotation.history</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="document_id"/>
+                <field name="version"/>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="tools_used"/>
+                <field name="page_count"/>
+                <field name="create_date"/>
+                <field name="annotated_attachment_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_pdf_annotation_history_form" model="ir.ui.view">
+        <field name="name">pdf.annotation.history.form</field>
+        <field name="model">pdf.annotation.history</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="document_id" readonly="1"/>
+                            <field name="version" readonly="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="create_date" readonly="1"/>
+                            <field name="tools_used" readonly="1"/>
+                            <field name="page_count" readonly="1"/>
+                            <field name="annotated_attachment_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="note" readonly="1"/>
+                    <field name="annotation_json" readonly="1" widget="text"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
