@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="document_pdf_annotation.PdfAnnotationClientAction">
+        <div class="o_pdf_annotator_root">
+            <div class="o_pdf_annotator_toolbar">
+                <button class="btn btn-primary" t-on-click="saveVersion">Save Version</button>
+                <button class="btn btn-secondary" t-on-click="addSimpleAnnotation">Apply Tool</button>
+                <button class="btn btn-light" t-on-click="undo">Undo</button>
+                <button class="btn btn-light" t-on-click="redo">Redo</button>
+
+                <label>Tool</label>
+                <select t-model="state.selectedTool">
+                    <option value="highlight">Highlight</option>
+                    <option value="underline">Underline</option>
+                    <option value="strike">Strike-through</option>
+                    <option value="freehand">Freehand</option>
+                    <option value="textbox">Text Box</option>
+                    <option value="sticky_note">Sticky Note</option>
+                    <option value="rectangle">Rectangle</option>
+                    <option value="circle">Circle</option>
+                    <option value="arrow">Arrow</option>
+                    <option value="line">Line</option>
+                    <option value="eraser">Eraser</option>
+                </select>
+
+                <label>Color</label>
+                <input type="color" t-model="state.selectedColor"/>
+
+                <label>Font Size</label>
+                <input type="number" min="8" max="48" t-model="state.fontSize"/>
+
+                <button class="btn btn-light" t-on-click="zoomOut">-</button>
+                <span><t t-esc="Math.round(state.zoom * 100)"/>%</span>
+                <button class="btn btn-light" t-on-click="zoomIn">+</button>
+
+                <label>Version</label>
+                <select t-on-change="selectVersion">
+                    <option value="">Latest</option>
+                    <t t-foreach="state.versions" t-as="version" t-key="version.id">
+                        <option t-att-value="version.id">
+                            v<t t-esc="version.version_number"/> - <t t-esc="version.created_by"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+
+            <div class="o_pdf_annotator_canvas" t-att-style="`transform: scale(${state.zoom}); transform-origin: top left;`">
+                <iframe t-ref="annotationCanvas" class="o_pdf_iframe"/>
+            </div>
+        </div>
+    </t>
+</templates>
