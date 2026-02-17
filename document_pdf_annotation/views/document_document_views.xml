@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_document_document_form_inherit_pdf_annotation" model="ir.ui.view">
+        <field name="name">document.document.form.pdf.annotation</field>
+        <field name="model">document.document</field>
+        <field name="inherit_id" ref="document.view_document_document_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/header" position="inside">
+                <button name="action_open_pdf_annotator"
+                        string="Annotate PDF"
+                        type="object"
+                        class="btn-primary"
+                        invisible="not is_pdf"/>
+            </xpath>
+            <xpath expr="//form/sheet" position="inside">
+                <div class="oe_button_box" name="button_box">
+                    <button type="object" class="oe_stat_button" name="action_open_versions" icon="fa-code-fork">
+                        <field name="version_count" string="Versions" widget="statinfo"/>
+                    </button>
+                    <button type="object" class="oe_stat_button" name="action_open_history" icon="fa-history">
+                        <field name="history_count" string="History" widget="statinfo"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//form/sheet/notebook" position="inside">
+                <page string="Versions">
+                    <field name="version_ids" readonly="1">
+                        <tree>
+                            <field name="version_number"/>
+                            <field name="created_by"/>
+                            <field name="created_on"/>
+                            <button string="Open" name="action_open_in_annotator" type="object" class="btn-link"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="History">
+                    <field name="history_ids" readonly="1">
+                        <tree>
+                            <field name="action_type"/>
+                            <field name="user_id"/>
+                            <field name="version_id"/>
+                            <field name="action_timestamp"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
