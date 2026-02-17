@@ -6,6 +6,11 @@ from odoo.http import request
 
 class PdfAnnotationController(http.Controller):
 
+    def _build_pdf_file_url(self, document, selected_version):
+        if selected_version:
+            return f"/web/content/document.document.version/{selected_version.id}/file_data?download=false"
+        return f"/web/content/document.document/{document.id}/file?download=false"
+
     @http.route("/document_pdf_annotation/load", type="json", auth="user")
     def load_document_annotation_context(self, document_id, version_id=None):
         document = request.env["document.document"].browse(document_id).exists()
@@ -30,6 +35,7 @@ class PdfAnnotationController(http.Controller):
             "document_id": document.id,
             "document_name": document.display_name,
             "file_b64": document.get_pdf_binary_b64(version_id=selected_version.id if selected_version else False),
+            "file_url": self._build_pdf_file_url(document, selected_version),
             "active_version_id": selected_version.id if selected_version else False,
             "active_version_number": selected_version.version_number if selected_version else 0,
             "annotation_payload": annotation_payload,

@@ -53,8 +53,17 @@ class PdfAnnotationClientAction extends Component {
         this.state.annotationPayload = this.normalizeAnnotationPayload(payload.annotation_payload);
 
         const iframe = this.canvasRef.el;
-        iframe.src = payload.file_b64 ? `data:application/pdf;base64,${payload.file_b64}` : "about:blank";
-        this.state.loading = false;
+        const fileSrc = payload.file_url || (payload.file_b64 ? `data:application/pdf;base64,${payload.file_b64}` : "about:blank");
+        iframe.onload = null;
+        iframe.onerror = null;
+        iframe.src = fileSrc;
+        iframe.onload = () => {
+            this.state.loading = false;
+        };
+        iframe.onerror = () => {
+            this.state.loading = false;
+            this.notification.add("Unable to load PDF preview.", { type: "danger" });
+        };
     }
 
     normalizeAnnotationPayload(rawPayload) {
