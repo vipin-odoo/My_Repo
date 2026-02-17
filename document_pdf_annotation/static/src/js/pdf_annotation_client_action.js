@@ -112,6 +112,29 @@ class PdfAnnotationClientAction extends Component {
         this.logAction("annotation_added", entry);
     }
 
+    updateAnnotationField(index, field, value) {
+        this.state.annotationPayload = this.normalizeAnnotationPayload(this.state.annotationPayload);
+        const annotation = this.state.annotationPayload.items[index];
+        if (!annotation) {
+            return;
+        }
+        annotation[field] = value;
+        this.logAction("annotation_updated", {
+            row_index: index,
+            field,
+            value,
+        });
+    }
+
+    removeAnnotation(index) {
+        this.state.annotationPayload = this.normalizeAnnotationPayload(this.state.annotationPayload);
+        if (index < 0 || index >= this.state.annotationPayload.items.length) {
+            return;
+        }
+        const [removed] = this.state.annotationPayload.items.splice(index, 1);
+        this.logAction("annotation_deleted", removed || { row_index: index });
+    }
+
     undo() {
         this.state.annotationPayload = this.normalizeAnnotationPayload(this.state.annotationPayload);
         if (this.state.annotationPayload.items.length) {

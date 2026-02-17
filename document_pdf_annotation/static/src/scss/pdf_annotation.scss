@@ -45,4 +45,27 @@
         border: 0;
         background: #fff;
     }
+
+    .o_pdf_annotation_table_wrapper {
+        border: 1px solid #d8dadd;
+        border-radius: 4px;
+        background: #fff;
+        padding: 10px;
+    }
+
+    .o_pdf_annotation_table_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        h4 {
+            margin: 0;
+            font-size: 16px;
+        }
+    }
+
+    .o_pdf_annotation_table {
+        margin-bottom: 0;
+    }
 }
