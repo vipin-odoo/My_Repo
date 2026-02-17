@@ -3,25 +3,24 @@
     <t t-name="document_pdf_annotation.PdfAnnotationClientAction">
         <div class="o_pdf_annotator_root">
             <div class="o_pdf_annotator_toolbar">
-                <button class="btn btn-primary" t-on-click="saveVersion">Save Version</button>
-                <button class="btn btn-secondary" t-on-click="addSimpleAnnotation">Apply Tool</button>
+                <button class="btn btn-primary" t-on-click="saveVersion">Save PDF</button>
                 <button class="btn btn-light" t-on-click="undo">Undo</button>
                 <button class="btn btn-light" t-on-click="redo">Redo</button>
 
-                <label>Tool</label>
-                <select t-model="state.selectedTool">
-                    <option value="highlight">Highlight</option>
-                    <option value="underline">Underline</option>
-                    <option value="strike">Strike-through</option>
-                    <option value="freehand">Freehand</option>
-                    <option value="textbox">Text Box</option>
-                    <option value="sticky_note">Sticky Note</option>
-                    <option value="rectangle">Rectangle</option>
-                    <option value="circle">Circle</option>
-                    <option value="arrow">Arrow</option>
-                    <option value="line">Line</option>
-                    <option value="eraser">Eraser</option>
-                </select>
+                <div class="o_pdf_tools" role="toolbar" aria-label="Annotation tools">
+                    <t t-foreach="tools" t-as="tool" t-key="tool.key">
+                        <button
+                            type="button"
+                            class="btn o_pdf_tool_btn"
+                            t-att-class="state.selectedTool === tool.key ? 'btn-primary' : 'btn-light'"
+                            t-on-click="() => this.selectTool(tool.key)"
+                            t-att-title="tool.label"
+                            t-att-aria-label="tool.label"
+                        >
+                            <i class="fa" t-att-class="tool.icon"/>
+                        </button>
+                    </t>
+                </div>
 
                 <label>Color</label>
                 <input type="color" t-model="state.selectedColor"/>
@@ -32,6 +31,8 @@
                 <button class="btn btn-light" t-on-click="zoomOut">-</button>
                 <span><t t-esc="Math.round(state.zoom * 100)"/>%</span>
                 <button class="btn btn-light" t-on-click="zoomIn">+</button>
+
+                <span class="o_pdf_save_hint">Click <strong>Save PDF</strong> after your edits to create a new saved version.</span>
 
                 <label>Version</label>
                 <select t-on-change="selectVersion">
