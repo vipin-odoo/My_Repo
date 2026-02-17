@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 
 
 class DocumentsDocument(models.Model):
-    _inherit = "documents.document"
+    _inherit = "document.document"
 
     annotation_version = fields.Integer(default=0, readonly=True)
     annotation_history_ids = fields.One2many(

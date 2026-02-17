@@ -1,7 +1,7 @@
 <odoo>
     <record id="view_documents_document_form_pdf_annotator" model="ir.ui.view">
-        <field name="name">documents.document.form.pdf.annotator</field>
-        <field name="model">documents.document</field>
+        <field name="name">document.document.form.pdf.annotator</field>
+        <field name="model">document.document</field>
         <field name="inherit_id" ref="documents.view_document_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">

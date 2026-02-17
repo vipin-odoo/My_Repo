@@ -24,7 +24,7 @@ class PdfAnnotatorAction extends Component {
 
         onMounted(async () => {
             const [payload] = await this.orm.call(
-                "documents.document",
+                "document.document",
                 "get_pdf_annotation_payload",
                 [[this.state.documentId]],
             );
@@ -197,7 +197,7 @@ class PdfAnnotatorAction extends Component {
         };
         const tools = [...new Set(this.state.annotations.map((a) => a.type))];
         await this.orm.call(
-            "documents.document",
+            "document.document",
             "save_pdf_annotation",
             [[this.state.documentId], JSON.stringify(payload), "Saved from annotator", tools, false],
         );

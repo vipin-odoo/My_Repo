@@ -7,7 +7,7 @@ class PdfAnnotationHistory(models.Model):
     _order = "version desc, create_date desc"
 
     document_id = fields.Many2one(
-        "documents.document",
+        "document.document",
         required=True,
         ondelete="cascade",
         index=True,
