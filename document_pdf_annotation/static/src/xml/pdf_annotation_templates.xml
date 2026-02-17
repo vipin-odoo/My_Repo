@@ -48,6 +48,86 @@
             <div class="o_pdf_annotator_canvas" t-att-style="`transform: scale(${state.zoom}); transform-origin: top left;`">
                 <iframe t-ref="annotationCanvas" class="o_pdf_iframe"/>
             </div>
+
+            <div class="o_pdf_annotation_table_wrapper">
+                <div class="o_pdf_annotation_table_header">
+                    <h4>Editable annotations (table view)</h4>
+                    <button type="button" class="btn btn-secondary" t-on-click="addSimpleAnnotation">
+                        Add row from selected tool
+                    </button>
+                </div>
+                <table class="table table-sm table-striped o_pdf_annotation_table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tool</th>
+                            <th>Color</th>
+                            <th>Font Size</th>
+                            <th>Note</th>
+                            <th>Timestamp</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-if="!state.annotationPayload.items.length">
+                            <td colspan="7" class="text-muted text-center">No annotation rows yet. Add one to edit from this table.</td>
+                        </tr>
+                        <t t-foreach="state.annotationPayload.items" t-as="item" t-foreach-index="itemIndex" t-key="itemIndex">
+                            <tr>
+                                <td><t t-esc="itemIndex + 1"/></td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        t-att-value="item.tool || ''"
+                                        t-on-input="(ev) => this.updateAnnotationField(itemIndex, 'tool', ev.target.value)"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-color"
+                                        type="color"
+                                        t-att-value="item.color || '#000000'"
+                                        t-on-input="(ev) => this.updateAnnotationField(itemIndex, 'color', ev.target.value)"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        type="number"
+                                        min="8"
+                                        max="72"
+                                        t-att-value="item.font_size || 14"
+                                        t-on-input="(ev) => this.updateAnnotationField(itemIndex, 'font_size', parseInt(ev.target.value, 10) || 14)"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        t-att-value="item.user_note || ''"
+                                        t-on-input="(ev) => this.updateAnnotationField(itemIndex, 'user_note', ev.target.value)"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        class="form-control form-control-sm"
+                                        t-att-value="item.timestamp || ''"
+                                        t-on-input="(ev) => this.updateAnnotationField(itemIndex, 'timestamp', ev.target.value)"
+                                    />
+                                </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        t-on-click="() => this.removeAnnotation(itemIndex)"
+                                    >
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </t>
 </templates>
