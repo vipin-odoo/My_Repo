@@ -33,9 +33,3 @@ Read `account.move` and include line values:
   "max_depth": 2
 }
 ```
-
-## Security
-
-- API keys are **never stored in plain text**.
-- The module stores a PBKDF2-SHA256 derived hash (`key_hash`) using Odoo's `database_secret` as salt input.
-- Raw keys are returned only once at creation time.

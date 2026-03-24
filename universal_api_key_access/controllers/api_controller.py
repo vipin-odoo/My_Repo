@@ -20,12 +20,12 @@ class UniversalApiController(http.Controller):
         if not user:
             return {"ok": False, "error": "Invalid user_id/login combination"}
 
-        _key_record, raw_key = request.env["universal.api.key"].sudo().create_for_user(user)
+
         return {
             "ok": True,
             "user_id": user.id,
             "login": user.login,
-            "api_key": raw_key,
+
         }
 
     @http.route("/api/model/read", type="json", auth="public", methods=["POST"], csrf=False, cors="*")
