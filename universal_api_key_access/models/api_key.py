@@ -1,6 +1,4 @@
-import secrets
 
-from odoo import api, fields, models
 
 
 class UniversalApiKey(models.Model):
@@ -10,27 +8,11 @@ class UniversalApiKey(models.Model):
 
     name = fields.Char(required=True)
     user_id = fields.Many2one("res.users", required=True, ondelete="cascade", index=True)
-    key = fields.Char(required=True, copy=False, index=True)
-    active = fields.Boolean(default=True)
-
-    _sql_constraints = [
-        ("universal_api_key_unique", "unique(key)", "API key must be unique."),
-    ]
-
-    @api.model
     def create_for_user(self, user):
         raw_key = secrets.token_urlsafe(40)
         key_record = self.create(
             {
                 "name": f"Key for {user.login}",
                 "user_id": user.id,
-                "key": raw_key,
-                "active": True,
-            }
-        )
-        return key_record
 
-    @api.model
-    def get_user_from_key(self, raw_key):
-        key_record = self.search([("key", "=", raw_key), ("active", "=", True)], limit=1)
         return key_record.user_id if key_record else self.env["res.users"]
