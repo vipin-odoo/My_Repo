@@ -12,20 +12,24 @@ class UniversalApiController(http.Controller):
         if not user_id or not login:
             return {"ok": False, "error": "user_id and login are required"}
 
-        user = request.env["res.users"].sudo().search([
-            ("id", "=", user_id),
-            ("login", "=", login),
-            ("active", "=", True),
-        ], limit=1)
+        user = request.env["res.users"].sudo().search(
+            [
+                ("id", "=", user_id),
+                ("login", "=", login),
+                ("active", "=", True),
+            ],
+            limit=1,
+        )
         if not user:
             return {"ok": False, "error": "Invalid user_id/login combination"}
 
+        generated = request.env["universal.api.key"].sudo().create_for_user(user)
 
         return {
             "ok": True,
             "user_id": user.id,
             "login": user.login,
-
+            "api_key": generated.get("raw_key"),
         }
 
     @http.route("/api/model/read", type="json", auth="public", methods=["POST"], csrf=False, cors="*")
@@ -77,10 +81,14 @@ class UniversalApiController(http.Controller):
                 field_value = record[field_name]
 
                 if field_type == "many2one":
-                    values[field_name] = {
-                        "id": field_value.id,
-                        "display_name": field_value.display_name,
-                    } if field_value else False
+                    values[field_name] = (
+                        {
+                            "id": field_value.id,
+                            "display_name": field_value.display_name,
+                        }
+                        if field_value
+                        else False
+                    )
                 elif field_type in ("one2many", "many2many"):
                     if include_relations and _current_depth < max_depth and field_value:
                         rel_field_names = list(field_value.fields_get().keys())
