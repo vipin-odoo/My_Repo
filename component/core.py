@@ -21,7 +21,19 @@ import operator
 from collections import OrderedDict, defaultdict
 
 from odoo import models
-from odoo.tools import LastOrderedSet, OrderedSet
+from odoo.tools import OrderedSet
+
+try:
+    from odoo.tools import LastOrderedSet
+except ImportError:
+    # Odoo 18 removed ``LastOrderedSet`` from ``odoo.tools``.
+    # Keep backward compatibility with previous Odoo versions while preserving
+    # the "last occurrence wins" behavior expected by this module.
+    class LastOrderedSet(OrderedSet):
+        def add(self, item):
+            if item in self:
+                self.discard(item)
+            super().add(item)
 
 from .exception import NoComponentError, SeveralComponentError
 
