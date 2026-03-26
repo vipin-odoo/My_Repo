@@ -29,13 +29,7 @@ from odoo.exceptions import (
     UserError,
     ValidationError,
 )
-from odoo.http import SessionExpiredException, request
 
-try:
-    from odoo.http import Root
-except ImportError:
-    # Odoo 18 no longer exposes ``Root`` and provides a singleton ``root``.
-    from odoo.http import root as Root
 
 try:
     from odoo.http import HttpRequest
