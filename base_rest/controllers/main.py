@@ -7,7 +7,14 @@ from contextlib import contextmanager
 from werkzeug.exceptions import BadRequest
 
 from odoo import models
-from odoo.http import Controller, ControllerType, Response, request
+from odoo.http import Controller, Response, request
+
+try:
+    from odoo.http import ControllerType
+except ImportError:
+    # Odoo 18 no longer exposes ``ControllerType``.
+    # Use the metaclass of ``Controller`` to keep compatibility.
+    ControllerType = type(Controller)
 
 from odoo.addons.component.core import WorkContext, _get_addon_name
 
