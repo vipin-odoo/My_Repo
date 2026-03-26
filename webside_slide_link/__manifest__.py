@@ -3,10 +3,10 @@
 {
     'name': 'Website Slider Link',
     'summary': 'This will open a Ifram',
-    'version': '15.0.0.1',
+    'version': '18.0.1.0.0',
     'author': 'Sachin/sachin.odoo@gmail.com',
     "license": "LGPL-3",
-    'depends': ['website_slides_survey','website'],
+    'depends': ['website_slides_survey', 'website'],
     'data': [  
                 
                 'views/website_slide_template_inherit.xml',
