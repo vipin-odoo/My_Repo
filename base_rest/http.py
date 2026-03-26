@@ -29,7 +29,14 @@ from odoo.exceptions import (
     UserError,
     ValidationError,
 )
-from odoo.http import HttpRequest, Root, SessionExpiredException, request
+from odoo.http import Root, SessionExpiredException, request
+
+try:
+    from odoo.http import HttpRequest
+except ImportError:
+    # Odoo 18 no longer exports ``HttpRequest``.
+    # ``Request`` is the replacement base request class.
+    from odoo.http import Request as HttpRequest
 from odoo.tools import ustr
 from odoo.tools.config import config
 
