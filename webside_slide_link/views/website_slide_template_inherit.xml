@@ -18,13 +18,13 @@
                 </xpath>
                 <xpath expr="//field[@name='url']" position="replace">
                 
-                <field name="url" attrs="{
-                                            'required': [('slide_type', 'in', ('video')),('is_external_link','=',False)],
-                                            'invisible': [('slide_type', 'not in', ('video')),('is_external_link','=',False)]}" />
+                <field
+                    name="url"
+                    required="slide_type == 'video' and not is_external_link"
+                    invisible="slide_type != 'video' or is_external_link"
+                />
 
-                <field name="new_url" attrs="{
-                                            
-                                            'invisible': [('is_external_link','=',False)]}"/>
+                <field name="new_url" invisible="not is_external_link"/>
                 </xpath>
                 
             </field>
