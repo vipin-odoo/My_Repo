@@ -29,7 +29,6 @@ from odoo.exceptions import (
     UserError,
     ValidationError,
 )
-from odoo.http import SessionExpiredException, request
 
 try:
     from odoo.http import HttpRequest
@@ -217,28 +216,3 @@ class HttpRestRequest(HttpRequest):
         return self.make_response(data, headers=headers, cookies=cookies)
 
 
-if _http_root and hasattr(_http_root, "get_request"):
-    ori_get_request = _http_root.get_request
-
-    def get_request(self, httprequest):
-        db = httprequest.session.db
-        if db and odoo.service.db.exp_db_exist(db):
-            # on the very first request processed by a worker,
-            # registry is not loaded yet
-            # so we enforce its loading here to make sure that
-            # _rest_services_databases is not empty
-            odoo.registry(db)
-            rest_routes = _rest_services_routes.get(db, [])
-            for root_path in rest_routes:
-                if httprequest.path.startswith(root_path):
-                    return HttpRestRequest(httprequest)
-        return ori_get_request(self, httprequest)
-
-    if isinstance(_http_root, type):
-        _http_root.get_request = get_request
-    else:
-        _http_root.get_request = get_request.__get__(
-            _http_root, _http_root.__class__
-        )
-else:
-    _logger.warning("Unable to patch Odoo HTTP request root: get_request not found.")
