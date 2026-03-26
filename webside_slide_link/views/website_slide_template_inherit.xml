@@ -1,0 +1,143 @@
+<?xml version="1.0" ?>
+<odoo>
+	<data>
+
+
+
+        <record id="view_slide_slide_form_wo_custom_is_default" model="ir.ui.view">
+            <field name="name">slide.slide.form.wo.channel_id</field>
+            <field name="model">slide.slide</field>
+            <field name="inherit_id" ref="website_slides.view_slide_slide_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='link_ids']/tree" position="inside">
+                    <field name="is_default"/>
+                </xpath>
+                <xpath expr="//field[@name='slide_type']" position="after">
+                    <field name="is_external_link"/>
+                </xpath>
+                <xpath expr="//field[@name='url']" position="replace">
+                
+                <field name="url" attrs="{
+                                            'required': [('slide_type', 'in', ('video')),('is_external_link','=',False)],
+                                            'invisible': [('slide_type', 'not in', ('video')),('is_external_link','=',False)]}" />
+
+                <field name="new_url" attrs="{
+                                            
+                                            'invisible': [('is_external_link','=',False)]}"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <template id="survey_fill_form_done_inherit_website_slides_custom" inherit_id="survey.survey_fill_form_done">
+            <xpath expr="//div[hasclass('o_survey_finished')]//a[hasclass('btn-secondary')]" position="replace">
+                    <a role="button" class="mr-2 mt-2 mt-md-0 btn btn-secondary btn-lg d-none" href="#" data-toggle="modal" t-attf-data-target="#slideChannelShareModal_{{channel_id.id}}">
+                        <i class="fa fa-share-alt" aria-label="Share certification" title="Share certification"/>
+                        Share your certification
+                    </a>
+                    
+            </xpath>
+            <xpath expr="//div[@t-if='channel_id']"  position="replace">
+                <div t-if="channel_id" class="mt16">
+                    <a role="button"
+                        class="btn btn-primary btn-lg"
+                        t-att-href="channel_id.website_url" style="display:none;">
+                        Go back to course
+                    </a>
+                </div>
+            </xpath>
+        </template>
+
+
+		<template name="Open Url in Iframe" id="slide_fullscreen_open_Ifram" inherit_id="website_slides.slide_fullscreen_sidebar_category">
+    <xpath expr="//div" position="replace">
+        <div class="ml-2">
+                        <a t-if="can_access" class="d-block pt-1" href="#">
+                            <div class="d-flex ">
+                                <t t-call="website_slides.slide_icon"/>
+                                <div class="o_wslides_fs_slide_name" t-esc="slide.name"/>
+                                
+                            </div>
+                        </a>
+                        <span t-else="" class="d-block pt-1" href="#">
+                            <div class="d-flex ">
+                                <t t-set="icon_class" t-value="'mr-2 text-600'"/>
+                                <t t-call="website_slides.slide_icon"/>
+                                <div class="o_wslides_fs_slide_name text-600" t-esc="slide.name"/>
+                                
+                            </div>
+                        </span>
+                        <ul class="list-unstyled w-100 pt-2 small" t-if="slide.link_ids or slide.slide_resource_ids or (slide.question_ids and not slide.slide_type =='quiz')" >
+                            <li t-if="slide.link_ids" t-foreach="slide.link_ids" t-as="link" class="pl-0 mb-1">
+                                <script>
+                                    function myFunction(event) {
+  input_link = event.getElementsByTagName("input")
+
+  web_page_tag= document.getElementsByClassName('o_wslides_fs_content')
+  var ifrm = document.createElement('iframe');
+ifrm.setAttribute('title', input_link[0].value);
+ifrm.setAttribute('src', input_link[0].value); // assign an id
+ifrm.setAttribute('width', '100%'); // assign an id
+
+
+
+  web_page_tag[0].innerHTML=''
+  web_page_tag[0].appendChild(ifrm)
+}
+                                </script>
+                                <!-- <button onclick="myFunction(this)" type="button">Click Me!
+                                <input type="hidden"  t-att-value="link.link"/>
+                                </button> -->
+
+                                <a t-if="can_access" class="o_wslides_fs_slide_link"  target="_blank" onclick="myFunction(this)" style="cursor: pointer;">
+                                    <input type="hidden"  t-att-value="link.link"/>
+                                    <i class="fa fa-link mr-2"/><span t-esc="link.name"/>
+                                </a>
+                                
+                                <span t-else="" class="o_wslides_fs_slide_link text-600">
+                                    <i class="fa fa-link mr-2"/><span t-esc="link.name"/>
+                                </span>
+                                <t t-if="slide.id == current_slide.id and link.is_default == True">
+                                    <input type="hidden" class="dynamic_reg" t-att-value="link.is_default"/>
+                                    </t>
+                            </li>
+                            <div class="o_wslides_js_course_join pl-0" t-if="slide.slide_resource_ids">
+                                <t t-if="is_member or slide.channel_id.can_publish">
+                                    <li t-foreach="slide.slide_resource_ids" t-as="resource" class="mb-1">
+                                        <a class="o_wslides_fs_slide_link" t-attf-href="/web/content/slide.slide.resource/#{resource.id}/data?download=true">
+                                            <i class="fa fa-download mr-2"/><span t-esc="resource.name"/>
+                                        </a>
+
+                                    </li>
+                                </t>
+                                <li t-elif="slide.channel_id.enroll == 'public'" class="o_wslides_fs_slide_link mb-1">
+                                    <i class="fa fa-download mr-1"/>
+                                    <t t-call="website_slides.join_course_link"/>
+                                </li>
+                            </div>
+
+                            <li class="o_wslides_fs_sidebar_list_item pl-0 mb-1" t-if="slide.question_ids and not slide.slide_type == 'quiz'"
+                                t-att-data-id="slide.id"
+                                t-att-data-can-access="can_access"
+                                t-att-data-name="slide.name"
+                                t-att-data-type="slide.slide_type"
+                                t-att-data-slug="slug(slide)"
+                                t-att-data-has-question="1 if slide.question_ids else 0"
+                                t-att-data-is-quiz="1"
+                                t-att-data-completed="1 if slide_completed else 0"
+                                t-att-data-is-member="is_member"
+                                t-att-data-session-answers="session_answers">
+                                <a t-if="can_access" class="o_wslides_fs_slide_quiz" href="#" t-att-index="i">
+                                    <i class="fa fa-flag-checkered text-warning mr-2"/>Quiz
+                                </a>
+                                <span t-else="" class="text-600">
+                                    <i class="fa fa-flag-checkered text-warning mr-2"/>Quiz
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+    </xpath>
+</template>
+	</data>
+</odoo>

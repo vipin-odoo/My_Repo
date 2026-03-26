@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<odoo>
+	<data>
+
+
+	<record id="survey_question_form_form_inherit_payment" model="ir.ui.view">
+        <field name="name">survey.question.form.inherit.question</field>
+        <field name="model">survey.question</field>
+        <field name="inherit_id" ref="survey.survey_question_form"/>
+        <field name="arch" type="xml">
+            <field name="question_type" position="before">
+            	<field name="image_publish"/>
+            	<!-- <field name="image"/> -->
+            </field>
+            <xpath expr="//sheet/div" position="inside">
+            	<field name="image" widget="image" class="oe_avatar"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="survey_question_form_form_inherit_payment" model="ir.ui.view">
+        <field name="name">slide.question.form.inherit.question</field>
+        <field name="model">slide.question</field>
+        <field name="inherit_id" ref="website_slides.slide_question_view_form"/>
+        <field name="arch" type="xml">
+            <field name="answer_ids" position="before">
+            	<group>
+            		<group>
+            	<field name="image_publish"/>
+            </group>
+            <group>
+
+            	<field name="image" widget="image" class="oe_avatar" nolabel="1" style="float: left;"/>
+            </group>
+            </group>
+            	<!-- <field name="image"/> -->
+            </field>
+            <!-- <xpath expr="//field[@name='answer_ids']/" position="inside">
+            	<field name="image" widget="image" class="oe_avatar"/>
+            </xpath> -->
+        </field>
+    </record>
+</data>
+</odoo>

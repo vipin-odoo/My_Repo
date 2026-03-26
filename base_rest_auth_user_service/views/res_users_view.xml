@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_users_form_custom_inherit" model="ir.ui.view">
+            <field name="name">res.users.form.inherit.custom</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Related Users">
+                        <group>
+                            <group>
+                                <field name="user_ids" widget="many2many_tags"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="view_partners_form_member_form" model="ir.ui.view">
+        <field name="name">view.res.partner.form.member.record</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority" eval="15"/>
+        <field name="arch" type="xml">
+            <field name="child_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+
+            </field>
+            <field name="child_ids" position="after">
+                 <field name="member_ids" >
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="login"/>
+                                </tree>
+                            </field>
+                
+
+            </field>
+        </field>
+    </record>
+</data>
+</odoo>

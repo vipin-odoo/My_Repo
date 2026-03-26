@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="course_sidebar_inherit" inherit_id="website_slides.course_sidebar"  name="Course Slider">
+            <xpath expr="//div[@id='o_wslides_sidebar_collapse']/table/tr[last()]" position="replace">
+
+        	</xpath>
+        	<xpath expr="//div[@id='o_wslides_sidebar_collapse']/div" position="replace">
+            	
+        	</xpath>
+        </template>
+        <template id="user_dropdown_inherit" inherit_id="portal.user_dropdown"  name="Course Slider">
+            <xpath expr="//li" position="replace">
+            	<li t-if="is_connected" t-attf-class="#{_item_class} o_no_autohide_item">
+            <a href="#" role="button" t-attf-class="dropdown-toggle #{_link_class}">
+                <t t-if="_avatar">
+                    <t t-set="avatar_source" t-value="image_data_uri(user_id.avatar_256)"/>
+                    <img t-att-src="avatar_source" t-attf-class="rounded-circle o_object_fit_cover #{_avatar_class}" width="24" height="24" alt="" loading="eager"/>
+                </t>
+                <i t-if="_icon" t-attf-class="fa fa-1x fa-fw fa-user-circle-o #{_icon_class}"/>
+                <span t-if="_user_name" t-attf-class="#{_user_name_class}" t-esc="user_id.name[:23] + '...' if user_id.name and len(user_id.name) &gt; 25 else user_id.name"/>
+            </a>
+            <div t-attf-class="dropdown-menu js_usermenu #{_dropdown_menu_class}" role="menu">
+                <div id="o_logout_divider" class="dropdown-divider"/>
+                <a t-attf-href="/web/session/logout?redirect=/" role="menuitem" id="o_logout" class="dropdown-item">Logout</a>
+            </div>
+        </li>
+
+        	</xpath>
+        	<!-- <xpath expr="//div[@id='o_wslides_sidebar_collapse']/div" position="replace"> -->
+            	
+        	<!-- </xpath> -->
+        </template>
+	</data>
+</odoo>

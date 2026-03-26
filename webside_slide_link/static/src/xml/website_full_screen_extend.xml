@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+	<t t-name="website.slides.fullscreen.certification.custom">
+        <div class="justify-content-center align-self-center">
+            <div t-if="widget.get('slide').type === 'certification' &amp;&amp; !widget.get('slide').completed" class="">
+                <script>
+                                    function myFunction(event) {
+  console.log("---------------------------",event)
+  input_link = event.getElementsByTagName("input")
+
+  web_page_tag= document.getElementsByClassName('o_wslides_fs_content')
+  var ifrm = document.createElement('iframe');
+ifrm.setAttribute('title', input_link[0].value);
+ifrm.setAttribute('src', '/slides_survey/slide/get_certification_url?slide_id='+input_link[0].value); // assign an id
+ifrm.setAttribute('width', '100%'); // assign an id
+
+
+
+  console.log("gggggggggggggggggggggggggggggggggg",input_link[0].value,web_page_tag,ifrm)
+  web_page_tag[0].innerHTML=''
+  web_page_tag[0].appendChild(ifrm)
+}
+                                </script>
+                <a class="btn btn-primary" target="_blank" onclick="myFunction(this)" style="cursor: pointer;color:white;">
+                    <input type="hidden" t-att-value="widget.get('slide').id"/>
+                    <i class="fa fa-trophy"/>
+                    <span t-if="widget.get('slide').isMember"> Take Assessment</span>
+                    <span t-else="">Test Certification</span>
+                </a>
+            </div>
+            <div class="" t-if="widget.get('slide').type === 'certification' &amp;&amp; widget.get('slide').completed">
+                <a role="button" class="btn btn-primary" t-att-href="'/survey/' + widget.get('slide').certificationId + '/get_certification'">
+                    <i class="fa fa-fw fa-trophy" role="img" aria-label="Download certification" title="Download certification"/> Download certification
+                </a>
+            </div>
+        </div>
+    </t>
+</templates>

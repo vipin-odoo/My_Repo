@@ -1,0 +1,196 @@
+<?xml version="1.0" ?>
+<odoo>
+	<data>
+
+    <template id="website.option_header_brand_logo" inherit_id="website.placeholder_header_brand" name="Header Brand Logo" active="True">
+            <xpath expr="//*[@id='o_fake_navbar_brand']" position="replace">
+                <a href="#" t-attf-class="navbar-brand logo #{_link_class}">
+                    <span t-field="website.logo" t-options="{'widget': 'image'}" role="img" t-att-aria-label="'Logo of %s' % website.name" t-att-title="website.name"/>
+                </a>
+            </xpath>
+        </template>
+
+        <template id="course_nav_custom" inherit_id="website_slides.course_nav">
+            <xpath expr="//div" position="attributes">
+                <attribute name="style">display:none;</attribute>
+            </xpath>
+        </template>
+
+         <template id="custom_lesson_content_quiz_add_buttons" inherit_id="website_slides.lesson_content_quiz_add_buttons">
+            <xpath expr="//div[hasclass('o_wslides_js_lesson_quiz_new_question')]" position="attributes">
+                     <attribute name="style">display:none;</attribute>
+                  </xpath>
+         </template>
+
+
+        <template id="slide_content_detailed_custom" inherit_id="website_slides.slide_content_detailed">
+            <xpath expr="//div[hasclass('mb-5')]/ul/li[3]" position="replace">
+                    <!--  <attribute name="style">display:none;</attribute> -->
+                  </xpath>
+            <xpath expr="//div[hasclass('mb-5')]/ul/li[3]" position="replace">
+                     <!-- <attribute name="style">display:none;</attribute> -->
+                  </xpath>
+            <xpath expr="//div[hasclass('o_wslides_lesson_content_type')]" position="replace">
+                <div class="o_wslides_lesson_content_type">
+        <img t-if="slide.slide_type == 'infographic'"
+            t-att-src="website.image_url(slide, 'image_1024')" class="img-fluid" style="width:100%" t-att-alt="slide.name"/>
+        <div t-if="slide.slide_type in ('presentation', 'document')" class="embed-responsive embed-responsive-4by3 embed-responsive-item mb8" style="height: 600px;">
+            <t t-out="slide.embed_code"/>
+        </div>
+        <div t-if="slide.slide_type == 'video' and slide.document_id" class="embed-responsive embed-responsive-16by9 embed-responsive-item mb8">
+            <t t-if="slide.is_external_link">
+            <video type="video/mp4" height="100%" width="100%" oncontextmenu="return false;" controls="1" autoplay="1" name="media" controlslist="nodownload" ><source t-att-src="slide.new_url" type="video/mp4"/></video>
+        </t>
+        <t t-else="">
+            <t t-out="slide.embed_code"/>
+        </t>
+        </div>
+        <div t-if="slide.slide_type == 'webpage'" class="bg-white p-3">
+            <t t-foreach="slide.link_ids" t-as="link_id">
+                <t t-if="link_id.is_default">
+                    <iframe title="link_id.name" t-att-src="link_id.link" width="100%" height="576px">
+                    </iframe>
+                </t>
+            </t>
+            <!-- <div t-field="slide.html_content"/> -->
+        </div>
+    
+                <div t-if="slide.slide_type == 'certification' and not channel_progress[slide.id].get('completed')" class="col mt32 mb8 d-flex justify-content-center">
+                     <script>
+                                    function get_iframe(event) {
+  input_link = event.getElementsByTagName("input")
+
+  web_page_tag= document.getElementsByClassName('o_wslides_lesson_content_type')
+  var ifrm = document.createElement('iframe');
+ifrm.setAttribute('title', input_link[0].value);
+ifrm.setAttribute('src', '/slides_survey/slide/get_certification_url?slide_id='+input_link[0].value); // assign an id
+ifrm.setAttribute('width', '100%'); // assign an id
+ifrm.setAttribute('height', '576px');
+
+
+
+  web_page_tag[0].innerHTML=''
+  web_page_tag[0].appendChild(ifrm)
+}
+                                </script>
+                    <a role="button"
+                        class="btn btn-primary btn-lg"
+                        target="blank"  onclick="get_iframe(this)" style="cursor: pointer;">
+                                    <input type="hidden"  t-att-value="slide.id"/>>
+                        <i class="fa fa-fw fa-graduation-cap" role="img"/>
+                        <t t-if="slide.channel_id.is_member and slide.channel_id.active">Begin Certification</t>
+                        <t t-else="">Testlll Certification</t>
+                    </a>
+                </div>
+                <div t-if="slide.slide_type == 'certification' and channel_progress[slide.id].get('completed')" class="col mt32 mb8 d-flex justify-content-center">
+                    <a role="button" class="btn btn-primary btn-lg" t-att-href="'/survey/%s/get_certification' % slide.survey_id.id">
+                        <i class="fa fa-fw fa-trophy" role="img" aria-label="Download certification" title="Download certification"/> Download certification
+                    </a>
+                </div>
+            </div>
+            </xpath>
+        </template>
+
+
+		<template name="Open Url in Iframe Mini" id="slide_aside_training_category_custom" inherit_id="website_slides.slide_aside_training_category">
+            <xpath expr="//li/a" position="replace">
+                <a t-att-href="('#collapse-%s') % (category.id if category else 0)" data-toggle="collapse" role="button" aria-expanded="true"
+            class="o_wslides_lesson_aside_list_link pl-2 text-600 text-uppercase text-decoration-none py-1 small d-block"
+            t-att-aria-controls="('collapse-%s') % (category.id if category else 0)">
+            <t t-if="category">
+                <b t-field="category.name"/>
+            </t>
+            <t t-else="">
+                <!-- <b>Uncategorized</b> -->
+            </t>
+        </a>
+            </xpath>
+    <xpath expr="//ul" position="replace">
+    	<ul class="collapse show p-0 m-0 list-unstyled" t-att-id="('collapse-%s') % (category.id if category else 0)" >
+            <t t-foreach="category_slide_ids" t-as="aside_slide">
+                <t t-set="slide_completed" t-value="channel_progress[aside_slide.id].get('completed')"/>
+                <t t-set="is_member" t-value="slide.channel_id.is_member"/>
+                <t t-set="can_access" t-value="aside_slide.is_preview or is_member or slide.channel_id.can_publish"/>
+                <li class="p-0 pb-1">
+
+                    <a t-att-href="'/slides/slide/%s' % (slug(aside_slide)) if can_access else '#'"
+                        t-att-class="'o_wslides_lesson_aside_list_link d-flex align-items-top px-2 pt-1 text-decoration-none %s%s' % (('bg-100 py-1 active' if aside_slide == slide else ''), 'text-muted' if not can_access else '')">
+                        <div t-if="is_member" >
+                            <i t-att-id="'o_wslides_lesson_aside_slide_check_%s' % (aside_slide.id)"
+                                t-att-class="'mr-1 fa fa-fw %s' % ('text-success fa-check-circle' if channel_progress[aside_slide.id].get('completed') else 'text-600 fa-circle')">
+                            </i>
+                        </div>
+                        <div class="o_wslides_lesson_link_name">
+                            <t t-call="website_slides.slide_icon">
+                                <t t-set="slide" t-value="aside_slide"/>
+                            </t>
+                            <span t-esc="aside_slide.name" class="mr-2"/>
+                        </div>
+                        <div class="ml-auto" t-if="aside_slide.question_ids">
+                            <span t-att-class="'badge badge-pill %s' % ('badge-success' if channel_progress[aside_slide.id].get('completed') else 'badge-light text-600')">
+                                <t t-esc="channel_progress[aside_slide.id].get('quiz_karma_won') if channel_progress[aside_slide.id].get('completed') else channel_progress[aside_slide.id].get('quiz_karma_gain')"/> xp
+                            </span>
+                        </div>
+                    </a>
+                    <ul t-if="aside_slide.link_ids or aside_slide.slide_resource_ids or aside_slide.question_ids" class="list-group px-2 mb-1 list-unstyled">
+                        <script>
+                                    function get_iframe(event) {
+  input_link = event.getElementsByTagName("input")
+
+  web_page_tag= document.getElementsByClassName('o_wslides_lesson_content_type')
+  var ifrm = document.createElement('iframe');
+ifrm.setAttribute('title', input_link[0].value);
+ifrm.setAttribute('src', input_link[0].value); // assign an id
+ifrm.setAttribute('width', '100%'); // assign an id
+ifrm.setAttribute('height', '431px');
+
+
+
+  console.log("gggggggggggggggggggggggggggggggggg",input_link[0].value,web_page_tag,ifrm)
+  web_page_tag[0].innerHTML=''
+  web_page_tag[0].appendChild(ifrm)
+}
+                                </script>
+                        <t t-foreach="aside_slide.link_ids" t-as="resource">
+                            <li class="pl-4">
+
+                                <a t-if="can_access"  target="blank" class="text-decoration-none small" onclick="get_iframe(this)" style="cursor: pointer;">
+                                    <input type="hidden"  t-att-value="resource.link"/>
+                                    
+                                    <i class="fa fa-link mr-1"/><span t-field="resource.name"/>
+                                </a>
+                                <span t-else="" class="text-decoration-none text-muted small">
+                                    <i class="fa fa-link mr-1"/><span t-field="resource.name"/>
+                                </span>
+                            </li>
+                        </t>
+                        <div class="o_wslides_js_course_join pl-4" t-if="aside_slide.slide_resource_ids">
+                            <t t-if="is_member or aside_slide.channel_id.can_publish">
+                                <li t-foreach="aside_slide.slide_resource_ids" t-as="resource">
+                                    <a t-attf-href="/web/content/slide.slide.resource/#{resource.id}/data?download=true" class="text-decoration-none small">
+                                        <i class="fa fa-download mr-1"/><span t-field="resource.name"/>
+                                    </a>
+                                </li>
+                            </t>
+                            <li t-elif="aside_slide.channel_id.enroll == 'public'" class="text-decoration-none small">
+                                <i class="fa fa-download mr-1"/>
+                                <t t-call="website_slides.join_course_link"/>
+                            </li>
+                        </div>
+                        <li t-if="aside_slide.question_ids and aside_slide.slide_type != 'quiz'" class="pl-4">
+                            <a t-if="can_access" t-att-href="'/slides/slide/%s#lessonQuiz' % (slug(aside_slide))"
+                                class="o_wslides_lesson_aside_list_link text-decoration-none small text-600">
+                                <i class="fa fa-flag text-warning"/> Quiz
+                            </a>
+                            <span t-else="" class="o_wslides_lesson_aside_list_link text-decoration-none small text-600 text-muted">
+                                <i class="fa fa-flag text-warning"/> Quiz
+                            </span>
+                        </li>
+                    </ul>
+                </li>
+            </t>
+        </ul>
+</xpath>
+</template>
+</data>
+</odoo>
