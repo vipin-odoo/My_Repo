@@ -30,7 +30,6 @@ from odoo.exceptions import (
     ValidationError,
 )
 
-
 try:
     from odoo.http import HttpRequest
 except ImportError:
@@ -43,6 +42,7 @@ from odoo.tools.config import config
 from .core import _rest_services_routes
 
 _logger = logging.getLogger(__name__)
+_http_root = getattr(odoo.http, "Root", None) or getattr(odoo.http, "root", None)
 
 try:
     import pyquerystring
@@ -216,25 +216,3 @@ class HttpRestRequest(HttpRequest):
         return self.make_response(data, headers=headers, cookies=cookies)
 
 
-ori_get_request = Root.get_request
-
-
-def get_request(self, httprequest):
-    db = httprequest.session.db
-    if db and odoo.service.db.exp_db_exist(db):
-        # on the very first request processed by a worker,
-        # registry is not loaded yet
-        # so we enforce its loading here to make sure that
-        # _rest_services_databases is not empty
-        odoo.registry(db)
-        rest_routes = _rest_services_routes.get(db, [])
-        for root_path in rest_routes:
-            if httprequest.path.startswith(root_path):
-                return HttpRestRequest(httprequest)
-    return ori_get_request(self, httprequest)
-
-
-if isinstance(Root, type):
-    Root.get_request = get_request
-else:
-    Root.get_request = get_request.__get__(Root, Root.__class__)
