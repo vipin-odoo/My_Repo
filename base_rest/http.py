@@ -29,7 +29,7 @@ from odoo.exceptions import (
     UserError,
     ValidationError,
 )
-from odoo.http import Root, SessionExpiredException, request
+
 
 try:
     from odoo.http import HttpRequest
@@ -234,4 +234,7 @@ def get_request(self, httprequest):
     return ori_get_request(self, httprequest)
 
 
-Root.get_request = get_request
+if isinstance(Root, type):
+    Root.get_request = get_request
+else:
+    Root.get_request = get_request.__get__(Root, Root.__class__)
