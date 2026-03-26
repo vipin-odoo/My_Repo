@@ -12,6 +12,7 @@ This code is inspired by ``odoo.addons.component.builder.ComponentBuilder``
 """
 import inspect
 import logging
+from collections import defaultdict
 
 from werkzeug.routing import Map, Rule
 
@@ -38,6 +39,14 @@ ROUTING_DECORATOR_ATTR = "routing"
 _logger = logging.getLogger(__name__)
 
 
+def _get_controllers_per_module():
+    controllers = getattr(http, "controllers_per_module", None)
+    if controllers is None:
+        controllers = defaultdict(list)
+        setattr(http, "controllers_per_module", controllers)
+    return controllers
+
+
 class RestServiceRegistration(models.AbstractModel):
     """Register REST services into the REST services registry
 
@@ -61,11 +70,12 @@ class RestServiceRegistration(models.AbstractModel):
         self.build_registry(services_registry)
         # we also have to remove the RestController from the
         # controller_per_module registry since it's an abstract controller
-        controllers = http.controllers_per_module["base_rest"]
+        controllers_per_module = _get_controllers_per_module()
+        controllers = controllers_per_module["base_rest"]
         controllers = [
             (name, cls) for name, cls in controllers if "RestController" not in name
         ]
-        http.controllers_per_module["base_rest"] = controllers
+        controllers_per_module["base_rest"] = controllers
         # create the final controller providing the http routes for
         # the services available into the current database
         self._build_controllers_routes(services_registry)
@@ -104,7 +114,8 @@ class RestServiceRegistration(models.AbstractModel):
 
         # register our conroller into the list of available controllers
         name_class = ("{}.{}".format(ctrl_cls.__module__, ctrl_cls.__name__), ctrl_cls)
-        http.controllers_per_module[addon_name].append(name_class)
+        controllers_per_module = _get_controllers_per_module()
+        controllers_per_module[addon_name].append(name_class)
         self._apply_defaults_to_controller_routes(controller_class=ctrl_cls)
 
     def _apply_defaults_to_controller_routes(self, controller_class):
